@@ -1,6 +1,3 @@
-
-# Pick either small or large image ------------------------------------------------------------------
-IMGS_FOLDER=imgs
 # Set the command for nvcc compiler -----------------------------------------------------------------
 NVCC=nvcc
 CUDA_INCLUDEPATH=${CUDA_HOME}/include
@@ -13,13 +10,13 @@ OPENCV_LIBS=-lopencv_core -lopencv_imgproc -lopencv_highgui
 NVCC_OPTS=-O3 -arch=sm_20 -Xcompiler -Wall -Xcompiler -Wextra -m64
 GCC_OPTS=-O3 -Wall -Wextra -m64 -std=c++1y
 #----------------------------------------------------------------------------------------------------
-APPLICATION_NAME=heat_transfer
-SPEED_VIDEO=1/0.07
+APPLICATION_NAME=heat_cuda
+SPEED_VIDEO="1/0.07"
 
 all: imgs_folder master create_run
 
 imgs_folder:
-	mkdir -p $(IMGS_FOLDER)
+	mkdir -p imgs
 
 master: main.o device.o Makefile
 	$(NVCC) -o $(APPLICATION_NAME) main.o device.o -L $(OPENCV_LIBPATH) $(OPENCV_LIBS) $(NVCC_OPTS)
@@ -31,10 +28,10 @@ device.o: device.cu utils.h
 	nvcc -c device.cu $(NVCC_OPTS)
 
 create_run:
-	@echo "./game_of_life_cuda && \
-	ffmpeg -r 24 -f image2 -r $(SPEED_VIDEO) -i $(IMGS_FOLDER)/%d.png -vcodec mpeg4 -y $(APPLICATION_NAME).mp4 && \
+	echo "./$(APPLICATION_NAME) && \
+	ffmpeg -r 24 -f image2 -r $(SPEED_VIDEO) -i imgs/%d.png -vcodec mpeg4 -y $(APPLICATION_NAME).mp4 > ffmpeg.log 2> ffmpeg.err && \
 	echo \"Success! Video '$(APPLICATION_NAME).mp4' was generated\"" > run.sh \
 	&& chmod +x run.sh
 
 clean:
-	rm -f run.sh *.o *.log $(IMGS_FOLDER)/*.png $(APPLICATION_NAME)
+	rm -f run.sh *.o *.log imgs/*.png $(APPLICATION_NAME) $(APPLICATION_NAME).mp4 ffmpeg.log ffmpeg.err
