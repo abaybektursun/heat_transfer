@@ -1,4 +1,4 @@
-# Heat Transfer Simulating with Finite Difference Method
+# Heat Transfer Simulation with Finite Difference Method
 
 CPU folder has serial Fortran implementation. GPU folder has parallel CUDA version for NVIDIA GPUs. Heatmap randomly generated and video file produced as a result of the simulation.
 
